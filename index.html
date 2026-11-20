@@ -4,17 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#10b981" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>MC Skins Hub - سكنات ماين كرافت</title>
+  <title>MC Skins Hub</title>
   <style>
     :root {
       --bg: #0b0f17;
       --surface: #131a26;
       --surface-2: #1b2536;
       --accent: #10b981;
-      --accent-dark: #059669;
       --text: #f3f4f6;
       --muted: #9ca3af;
       --danger: #ef4444;
@@ -22,26 +18,22 @@
       --radius: 14px;
     }
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text);
       padding-bottom: 84px;
-      line-height: 1.5;
     }
 
     header {
       position: sticky;
       top: 0;
       z-index: 20;
-      background: rgba(11, 15, 23, 0.9);
-      backdrop-filter: blur(12px);
+      background: rgba(11, 15, 23, 0.94);
+      backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
       padding: 12px 16px;
       display: flex;
@@ -50,13 +42,7 @@
       gap: 10px;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 800;
-      font-size: 1.05rem;
-    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05rem; }
 
     .brand-badge {
       width: 34px;
@@ -81,7 +67,6 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      transition: transform 0.12s ease, opacity 0.15s ease;
     }
 
     .btn:active { transform: scale(0.97); }
@@ -90,12 +75,7 @@
     .btn-danger { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
     .btn-sm { padding: 6px 10px; font-size: 0.78rem; border-radius: 8px; }
 
-    .controls {
-      padding: 12px 16px 4px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+    .controls { padding: 12px 16px 4px; display: flex; flex-direction: column; gap: 10px; }
 
     .search-box input {
       width: 100%;
@@ -108,16 +88,7 @@
       outline: none;
     }
 
-    .search-box input:focus { border-color: var(--accent); }
-
-    .cats {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 6px;
-      scrollbar-width: none;
-    }
-
+    .cats { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
     .cats::-webkit-scrollbar { display: none; }
 
     .cat-pill {
@@ -132,22 +103,10 @@
       cursor: pointer;
     }
 
-    .cat-pill.active {
-      background: var(--accent);
-      color: #052e16;
-      border-color: var(--accent);
-    }
+    .cat-pill.active { background: var(--accent); color: #052e16; border-color: var(--accent); }
 
-    .grid {
-      padding: 12px 16px;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    @media (min-width: 640px) {
-      .grid { grid-template-columns: repeat(4, 1fr); max-width: 1000px; margin: 0 auto; }
-    }
+    .grid { padding: 12px 16px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    @media (min-width: 640px) { .grid { grid-template-columns: repeat(4, 1fr); max-width: 1000px; margin: 0 auto; } }
 
     .card {
       background: var(--surface);
@@ -166,14 +125,9 @@
       display: grid;
       place-items: center;
       position: relative;
-      overflow: hidden;
     }
 
-    .preview-box canvas {
-      image-rendering: pixelated;
-      max-height: 125px;
-      max-width: 100%;
-    }
+    .preview-box canvas { image-rendering: pixelated; max-height: 125px; max-width: 100%; }
 
     .tag {
       position: absolute;
@@ -187,20 +141,8 @@
       font-weight: 700;
     }
 
-    .title {
-      font-weight: 800;
-      font-size: 0.9rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .card-actions {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-
+    .title { font-weight: 800; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-actions { display: flex; gap: 6px; align-items: center; }
     .card-actions .btn { flex: 1; }
 
     .section-box {
@@ -212,28 +154,10 @@
       max-width: 800px;
     }
 
-    @media (min-width: 640px) {
-      .section-box { margin: 18px auto; }
-    }
+    @media (min-width: 640px) { .section-box { margin: 18px auto; } }
 
-    .section-box h2, .section-box h3 {
-      margin-top: 0;
-      font-size: 1rem;
-    }
-
-    .field {
-      margin-bottom: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .field label {
-      font-size: 0.84rem;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
+    .field { margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 0.84rem; color: var(--muted); font-weight: 700; }
     .field input, .field select {
       background: var(--surface-2);
       border: 1px solid var(--border);
@@ -249,7 +173,6 @@
       left: 0;
       right: 0;
       background: rgba(19, 26, 38, 0.96);
-      backdrop-filter: blur(12px);
       border-top: 1px solid var(--border);
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -291,19 +214,9 @@
       white-space: nowrap;
     }
 
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .hidden { display: none !important; }
-
-    .empty {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 36px 16px;
-      color: var(--muted);
-    }
+    .empty { grid-column: 1 / -1; text-align: center; padding: 36px 16px; color: var(--muted); }
   </style>
 </head>
 <body>
@@ -313,42 +226,35 @@
       <div class="brand-badge">MC</div>
       <span>MC Skins Hub</span>
     </div>
-    <button class="btn btn-primary btn-sm" onclick="generateRandomSkin()">⚡ توليد سكن</button>
+    <button type="button" class="btn btn-primary btn-sm" id="btnGenTop">⚡ توليد سكن</button>
   </header>
 
-  <!-- تبويب التصفح -->
   <main id="tab-browse">
     <div class="controls">
       <div class="search-box">
-        <input type="search" id="searchInput" placeholder="ابحث عن سكن (محارب، نينجا، فضائي...)" oninput="renderSkins()" />
+        <input type="search" id="searchInput" placeholder="ابحث عن سكن..." />
       </div>
       <div class="cats" id="categoryList"></div>
     </div>
     <div class="grid" id="skinsGrid"></div>
   </main>
 
-  <!-- تبويب المفضلة -->
   <section id="tab-favs" class="hidden">
     <div class="section-box">
-      <h2>❤️ السكنات المفضلة</h2>
-      <p style="color: var(--muted); font-size: 0.85rem; margin-top: -6px;">محفوظة تلقائياً على جهازك.</p>
+      <h2 style="margin-top:0;">❤️ المفضلة</h2>
+      <p style="color: var(--muted); font-size: 0.85rem;">محفوظة على جهازك.</p>
     </div>
     <div class="grid" id="favsGrid"></div>
   </section>
 
-  <!-- تبويب رفع سكن للمجتمع -->
   <section id="tab-upload" class="hidden">
     <div class="section-box">
-      <h2>📤 أضف سكنك إلى المجتمع</h2>
-      <p style="color: var(--muted); font-size: 0.85rem;">
-        ارفع ملف سكن بصيغة <strong>PNG</strong> بأبعاد <strong>64×64</strong> أو <strong>128×128</strong> ليظهر مباشرة في قسم المجتمع.
-      </p>
-
+      <h2 style="margin-top:0;">📤 إضافة سكن للمجتمع</h2>
+      <p style="color: var(--muted); font-size: 0.85rem;">ارفع صورة PNG بأبعاد 64×64 أو 128×128.</p>
       <div class="field">
         <label>اسم السكن</label>
-        <input type="text" id="uploadName" placeholder="مثال: ظل الليل" maxlength="32" />
+        <input type="text" id="uploadName" placeholder="مثال: حارس الليل" maxlength="30" />
       </div>
-
       <div class="field">
         <label>التصنيف</label>
         <select id="uploadCat">
@@ -358,22 +264,407 @@
           <option value="شخصيات">شخصيات</option>
         </select>
       </div>
-
       <div class="field">
-        <label>ملف السكن (PNG)</label>
+        <label>ملف PNG</label>
         <input type="file" id="uploadFile" accept="image/png" />
       </div>
-
-      <button class="btn btn-primary" style="width: 100%;" onclick="handleUpload()">نشر السكن الآن</button>
+      <button type="button" class="btn btn-primary" style="width:100%;" id="btnPublishSkin">نشر السكن</button>
     </div>
   </section>
 
-  <!-- تبويب حول والسياسة والأيقونة -->
   <section id="tab-about" class="hidden">
     <div class="section-box">
-      <h2>🎨 أيقونة التطبيق الرسمية (512×512)</h2>
-      <p style="color: var(--muted); font-size: 0.85rem;">
-        حمّل الأيقونة الجاهزة لرفعها مباشرة في Google Play Console.
-      </p>
-      <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
-        <canvas id="appIconCanvas" width="96" height="96" style="border-radius: 20px; border: 1px
+      <h2 style="margin-top:0;">🎨 أيقونة التطبيق 512×512</h2>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <canvas id="appIconCanvas" width="96" height="96" style="border-radius:20px; border:1px solid var(--border);"></canvas>
+        <button type="button" class="btn btn-primary" id="btnDownloadIcon">⬇ تحميل الأيقونة</button>
+      </div>
+    </div>
+    <div class="section-box">
+      <h3>🔒 سياسة الخصوصية</h3>
+      <p style="color: var(--muted); font-size: 0.85rem;">لا يجمع التطبيق بيانات شخصية حساسة ويحفظ المفضلة محلياً على جهاز المستخدم.</p>
+      <h3>⚠️ إخلاء المسؤولية</h3>
+      <p style="color: var(--muted); font-size: 0.85rem; margin-bottom:0;">تطبيق غير رسمي ولا يرتبط بشركة Mojang AB أو Microsoft.</p>
+    </div>
+  </section>
+
+  <nav class="bottom-nav">
+    <button type="button" class="nav-btn active" data-tab="browse"><span>🏠</span><span>الرئيسية</span></button>
+    <button type="button" class="nav-btn" data-tab="favs"><span>❤️</span><span>المفضلة</span></button>
+    <button type="button" class="nav-btn" data-tab="upload"><span>➕</span><span>إضافة</span></button>
+    <button type="button" class="nav-btn" data-tab="about"><span>ℹ️</span><span>السياسة</span></button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (function () {
+      const CATEGORIES = ["الكل", "محاربون", "خيال ومستقبل", "شخصيات", "المجتمع"];
+      let activeCat = "الكل";
+
+      const DEFAULT_SKINS = [
+        { id: "d1", name: "حارس الزمرد", cat: "محاربون", palette: ["#10b981", "#064e3b", "#f3f4f6", "#34d399"], isCommunity: false },
+        { id: "d2", name: "سايبر نيون", cat: "خيال ومستقبل", palette: ["#38bdf8", "#1e1b4b", "#f472b6", "#22d3ee"], isCommunity: false },
+        { id: "d3", name: "قناص الظل", cat: "محاربون", palette: ["#64748b", "#0f172a", "#ef4444", "#94a3b8"], isCommunity: false },
+        { id: "d4", name: "رحّالة الصحراء", cat: "شخصيات", palette: ["#f59e0b", "#78350f", "#fef3c7", "#fbbf24"], isCommunity: false },
+        { id: "d5", name: "مبتكر الكتل", cat: "شخصيات", palette: ["#a855f7", "#3b0764", "#fde047", "#c084fc"], isCommunity: false },
+        { id: "d6", name: "درع الكريستال", cat: "خيال ومستقبل", palette: ["#2dd4bf", "#134e4a", "#e0f2fe", "#5eead4"], isCommunity: false }
+      ];
+
+      function readStore(key, fallback) {
+        try {
+          const val = localStorage.getItem(key);
+          return val ? JSON.parse(val) : fallback;
+        } catch (e) {
+          return fallback;
+        }
+      }
+
+      function writeStore(key, val) {
+        try {
+          localStorage.setItem(key, JSON.stringify(val));
+        } catch (e) {}
+      }
+
+      let extraSkins = readStore("mc_extra_skins_v2", []);
+      let favs = readStore("mc_favs_v2", []);
+      let hiddenIds = readStore("mc_hidden_v2", []);
+
+      function allSkins() {
+        return DEFAULT_SKINS.concat(extraSkins).filter(function (s) {
+          return hiddenIds.indexOf(s.id) === -1;
+        });
+      }
+
+      function toast(msg) {
+        const el = document.getElementById("toast");
+        if (!el) return;
+        el.textContent = msg;
+        el.classList.add("show");
+        clearTimeout(window._t);
+        window._t = setTimeout(function () { el.classList.remove("show"); }, 2000);
+      }
+
+      function switchTab(tabName) {
+        ["browse", "favs", "upload", "about"].forEach(function (t) {
+          const sec = document.getElementById("tab-" + t);
+          if (sec) sec.classList.toggle("hidden", t !== tabName);
+        });
+        document.querySelectorAll(".nav-btn").forEach(function (b) {
+          b.classList.toggle("active", b.getAttribute("data-tab") === tabName);
+        });
+        if (tabName === "favs") renderFavs();
+      }
+
+      function drawPreview(canvas, skin) {
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (skin.dataUrl) {
+          const img = new Image();
+          img.onload = function () {
+            ctx.imageSmoothingEnabled = false;
+            const scale = img.width / 64;
+            ctx.drawImage(img, 8 * scale, 8 * scale, 8 * scale, 8 * scale, 22, 8, 36, 36);
+            ctx.drawImage(img, 20 * scale, 20 * scale, 8 * scale, 12 * scale, 22, 44, 36, 44);
+            ctx.drawImage(img, 44 * scale, 20 * scale, 4 * scale, 12 * scale, 4, 44, 18, 44);
+            ctx.drawImage(img, 44 * scale, 20 * scale, 4 * scale, 12 * scale, 58, 44, 18, 44);
+          };
+          img.src = skin.dataUrl;
+          return;
+        }
+
+        const pal = skin.palette || ["#10b981", "#064e3b", "#ffffff", "#34d399"];
+        ctx.fillStyle = pal[0];
+        ctx.fillRect(22, 8, 36, 36);
+        ctx.fillStyle = pal[1];
+        ctx.fillRect(22, 8, 36, 9);
+        ctx.fillStyle = pal[2];
+        ctx.fillRect(28, 23, 7, 6);
+        ctx.fillRect(45, 23, 7, 6);
+        ctx.fillStyle = "#111827";
+        ctx.fillRect(30, 24, 4, 4);
+        ctx.fillRect(47, 24, 4, 4);
+        ctx.fillStyle = pal[3];
+        ctx.fillRect(22, 44, 36, 42);
+        ctx.fillStyle = pal[1];
+        ctx.fillRect(36, 44, 8, 42);
+        ctx.fillStyle = pal[0];
+        ctx.fillRect(4, 44, 18, 40);
+        ctx.fillRect(58, 44, 18, 40);
+      }
+
+      function downloadSkin(skin) {
+        const a = document.createElement("a");
+        if (skin.dataUrl) {
+          a.href = skin.dataUrl;
+        } else {
+          const c = document.createElement("canvas");
+          c.width = 64;
+          c.height = 64;
+          const ctx = c.getContext("2d");
+          const pal = skin.palette || ["#10b981", "#064e3b", "#ffffff", "#34d399"];
+          ctx.fillStyle = pal[0];
+          ctx.fillRect(8, 8, 24, 8);
+          ctx.fillStyle = pal[1];
+          ctx.fillRect(8, 8, 24, 3);
+          ctx.fillStyle = pal[2];
+          ctx.fillRect(10, 13, 3, 2);
+          ctx.fillRect(15, 13, 3, 2);
+          ctx.fillStyle = pal[3];
+          ctx.fillRect(20, 20, 8, 12);
+          ctx.fillStyle = pal[0];
+          ctx.fillRect(44, 20, 4, 12);
+          ctx.fillStyle = pal[1];
+          ctx.fillRect(4, 20, 4, 12);
+          a.href = c.toDataURL("image/png");
+        }
+        a.download = (skin.name || "skin").replace(/\s+/g, "_") + ".png";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        toast("تم تحميل السكن");
+      }
+
+      function toggleFav(id) {
+        const idx = favs.indexOf(id);
+        if (idx > -1) {
+          favs.splice(idx, 1);
+          toast("أُزيل من المفضلة");
+        } else {
+          favs.push(id);
+          toast("أُضيف إلى المفضلة");
+        }
+        writeStore("mc_favs_v2", favs);
+        renderGrid();
+        if (!document.getElementById("tab-favs").classList.contains("hidden")) renderFavs();
+      }
+
+      function reportSkin(id) {
+        hiddenIds.push(id);
+        writeStore("mc_hidden_v2", hiddenIds);
+        renderGrid();
+        toast("تم الإبلاغ وإخفاء السكن");
+      }
+
+      function makeCard(skin) {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const box = document.createElement("div");
+        box.className = "preview-box";
+        const cv = document.createElement("canvas");
+        cv.width = 80;
+        cv.height = 92;
+        drawPreview(cv, skin);
+
+        const tag = document.createElement("span");
+        tag.className = "tag";
+        tag.textContent = skin.cat;
+
+        box.appendChild(cv);
+        box.appendChild(tag);
+
+        const title = document.createElement("div");
+        title.className = "title";
+        title.textContent = skin.name;
+
+        const actions = document.createElement("div");
+        actions.className = "card-actions";
+
+        const dl = document.createElement("button");
+        dl.type = "button";
+        dl.className = "btn btn-primary btn-sm";
+        dl.textContent = "تحميل";
+        dl.addEventListener("click", function () { downloadSkin(skin); });
+
+        const fv = document.createElement("button");
+        fv.type = "button";
+        fv.className = "btn btn-secondary btn-sm";
+        fv.style.flex = "0 0 auto";
+        fv.textContent = favs.indexOf(skin.id) > -1 ? "❤️" : "🤍";
+        fv.addEventListener("click", function () { toggleFav(skin.id); });
+
+        actions.appendChild(dl);
+        actions.appendChild(fv);
+
+        card.appendChild(box);
+        card.appendChild(title);
+        card.appendChild(actions);
+
+        if (skin.isCommunity) {
+          const rep = document.createElement("button");
+          rep.type = "button";
+          rep.className = "btn btn-danger btn-sm";
+          rep.textContent = "🚩 إبلاغ";
+          rep.addEventListener("click", function () { reportSkin(skin.id); });
+          card.appendChild(rep);
+        }
+
+        return card;
+      }
+
+      function renderCats() {
+        const box = document.getElementById("categoryList");
+        box.innerHTML = "";
+        CATEGORIES.forEach(function (c) {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "cat-pill" + (activeCat === c ? " active" : "");
+          b.textContent = c;
+          b.addEventListener("click", function () {
+            activeCat = c;
+            renderCats();
+            renderGrid();
+          });
+          box.appendChild(b);
+        });
+      }
+
+      function renderGrid() {
+        const q = (document.getElementById("searchInput").value || "").trim().toLowerCase();
+        const grid = document.getElementById("skinsGrid");
+        grid.innerHTML = "";
+
+        const items = allSkins().filter(function (s) {
+          const okCat = activeCat === "الكل" || s.cat === activeCat;
+          const okQ = !q || s.name.toLowerCase().indexOf(q) > -1 || s.cat.toLowerCase().indexOf(q) > -1;
+          return okCat && okQ;
+        });
+
+        if (!items.length) {
+          grid.innerHTML = '<div class="empty">لا توجد سكنات مطابقة.</div>';
+          return;
+        }
+
+        items.forEach(function (s) { grid.appendChild(makeCard(s)); });
+      }
+
+      function renderFavs() {
+        const grid = document.getElementById("favsGrid");
+        grid.innerHTML = "";
+        const items = allSkins().filter(function (s) { return favs.indexOf(s.id) > -1; });
+        if (!items.length) {
+          grid.innerHTML = '<div class="empty">لا توجد سكنات في المفضلة بعد.</div>';
+          return;
+        }
+        items.forEach(function (s) { grid.appendChild(makeCard(s)); });
+      }
+
+      function generateSkin() {
+        const pre = ["ظل", "لهب", "جليد", "رعد", "نجم", "صقر", "شبح", "ملك"];
+        const suf = ["الأبعاد", "الكهف", "الليل", "الماس", "الفضاء", "الرمال"];
+        const pals = [
+          ["#ef4444", "#7f1d1d", "#fef08a", "#f87171"],
+          ["#3b82f6", "#1e3a8a", "#e0f2fe", "#60a5fa"],
+          ["#eab308", "#713f12", "#fef9c3", "#facc15"],
+          ["#ec4899", "#831843", "#fce7f3", "#f472b6"],
+          ["#14b8a6", "#134e4a", "#ccfbf1", "#2dd4bf"]
+        ];
+        const name = pre[Math.floor(Math.random() * pre.length)] + " " + suf[Math.floor(Math.random() * suf.length)];
+        const skin = {
+          id: "g_" + Date.now(),
+          name: name,
+          cat: "خيال ومستقبل",
+          palette: pals[Math.floor(Math.random() * pals.length)],
+          isCommunity: false
+        };
+        extraSkins.unshift(skin);
+        writeStore("mc_extra_skins_v2", extraSkins);
+        switchTab("browse");
+        activeCat = "الكل";
+        renderCats();
+        renderGrid();
+        toast("تم توليد: " + name);
+      }
+
+      function buildIcon512() {
+        const c = document.createElement("canvas");
+        c.width = 512;
+        c.height = 512;
+        const ctx = c.getContext("2d");
+        const g = ctx.createLinearGradient(0, 0, 512, 512);
+        g.addColorStop(0, "#10b981");
+        g.addColorStop(1, "#064e3b");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 512, 512);
+
+        ctx.fillStyle = "#ecfdf5";
+        ctx.fillRect(112, 128, 288, 256);
+        ctx.fillStyle = "#065f46";
+        ctx.fillRect(112, 128, 288, 64);
+
+        ctx.fillStyle = "#111827";
+        ctx.fillRect(160, 224, 64, 56);
+        ctx.fillRect(288, 224, 64, 56);
+        ctx.fillRect(208, 312, 96, 36);
+
+        const pv = document.getElementById("appIconCanvas");
+        if (pv) pv.getContext("2d").drawImage(c, 0, 0, 96, 96);
+        return c;
+      }
+
+      document.getElementById("btnGenTop").addEventListener("click", generateSkin);
+      document.getElementById("searchInput").addEventListener("input", renderGrid);
+
+      document.querySelectorAll(".nav-btn").forEach(function (b) {
+        b.addEventListener("click", function () {
+          switchTab(b.getAttribute("data-tab"));
+        });
+      });
+
+      document.getElementById("btnPublishSkin").addEventListener("click", function () {
+        const name = (document.getElementById("uploadName").value || "").trim();
+        const cat = document.getElementById("uploadCat").value;
+        const fi = document.getElementById("uploadFile");
+        const file = fi.files && fi.files[0];
+
+        if (!name) return toast("اكتب اسم السكن");
+        if (!file || file.type !== "image/png") return toast("اختر ملف PNG");
+
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+          const img = new Image();
+          img.onload = function () {
+            const ok = (img.width === 64 && img.height === 64) || (img.width === 128 && img.height === 128);
+            if (!ok) return toast("الأبعاد يجب أن تكون 64×64 أو 128×128");
+            extraSkins.unshift({
+              id: "c_" + Date.now(),
+              name: name,
+              cat: cat,
+              dataUrl: ev.target.result,
+              isCommunity: true
+            });
+            writeStore("mc_extra_skins_v2", extraSkins);
+            document.getElementById("uploadName").value = "";
+            fi.value = "";
+            switchTab("browse");
+            activeCat = "الكل";
+            renderCats();
+            renderGrid();
+            toast("تم نشر السكن");
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      document.getElementById("btnDownloadIcon").addEventListener("click", function () {
+        const c = buildIcon512();
+        const a = document.createElement("a");
+        a.href = c.toDataURL("image/png");
+        a.download = "mc-skins-hub-512.png";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        toast("تم تحميل الأيقونة");
+      });
+
+      renderCats();
+      renderGrid();
+      buildIcon512();
+    })();
+  </script>
+</body>
+</html>
+ 
