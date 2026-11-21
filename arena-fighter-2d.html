@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>صراع الملوك - 2D Arena Fighter</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: #090b10;
+      color: #f8fafc;
+      font-family: system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+    #gameContainer {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    #hud {
+      position: absolute;
+      top: 10px;
+      left: 14px;
+      right: 14px;
+      display: none;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .player-hud {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .hp-box {
+      background: rgba(0, 0, 0, 0.72);
+      border: 2px solid #475569;
+      border-radius: 8px;
+      padding: 3px;
+      height: 24px;
+      overflow: hidden;
+    }
+    .hp-bar {
+      height: 100%;
+      width: 100%;
+      border-radius: 5px;
+      transition: width 0.12s linear;
+    }
+    #p1Hp {
+      background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+      float: right;
+    }
+    #p2Hp {
+      background: linear-gradient(90deg, #ef4444, #f97316);
+      float: left;
+    }
+    .sp-box {
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid #334155;
+      border-radius: 6px;
+      height: 9px;
+      overflow: hidden;
+      width: 75%;
+    }
+    #p1SpBox { align-self: flex-end; }
+    #p2SpBox { align-self: flex-start; }
+    .sp-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #eab308, #fef08a);
+      transition: width 0.12s linear;
+    }
+    #p1Sp { float: right; }
+    #p2Sp { float: left; }
+    .name-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 0 2px;
+    }
+    #centerHud {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    #timer {
+      width: 54px;
+      height: 40px;
+      background: #111827;
+      border: 2px solid #f59e0b;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      font-weight: 900;
+      color: #fbbf24;
+    }
+    #soundBtn {
+      pointer-events: auto;
+      background: rgba(17, 24, 39, 0.85);
+      border: 1px solid #475569;
+      color: #fff;
+      border-radius: 8px;
+      padding: 3px 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    #controls {
+      position: absolute;
+      bottom: 14px;
+      left: 16px;
+      right: 16px;
+      display: none;
+      justify-content: space-between;
+      align-items: flex-end;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      pointer-events: auto;
+    }
+    .pad {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.14);
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pad.pressed {
+      background: rgba(255, 255, 255, 0.38);
+      transform: scale(0.93);
+    }
+    .atk {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #fff;
+    }
+    #btnPunch { background: rgba(239, 68, 68, 0.55); border-color: #fca5a5; }
+    #btnKick { background: rgba(245, 158, 11, 0.55); border-color: #fde68a; }
+    #btnSpecial {
+      background: rgba(168, 85, 247, 0.35);
+      border-color: #c084fc;
+      opacity: 0.45;
+    }
+    #btnSpecial.ready {
+      opacity: 1;
+      background: rgba(168, 85, 247, 0.85);
+      box-shadow: 0 0 14px #c084fc;
+    }
+    .screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 11, 16, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      z-index: 20;
+      text-align: center;
+      padding: 18px;
+    }
+    #endScreen { display: none; }
+    .title {
+      font-size: 28px;
+      font-weight: 900;
+      color: #fbbf24;
+    }
+    .sub {
+      font-size: 13px;
+      color: #cbd5e1;
+      max-width: 460px;
+    }
+    .diff-row {
+      display: flex;
+      gap: 8px;
+    }
+    .diff-btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid #64748b;
+      background: #1e293b;
+      color: #e2e8f0;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .diff-btn.active {
+      background: #f59e0b;
+      color: #090b10;
+      border-color: #fbbf24;
+    }
+    .primary-btn {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 10px;
+      background: #0ea5e9;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    #rotateWarning {
+      position: absolute;
+      inset: 0;
+      background: #090b10;
+      z-index: 30;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      gap: 10px;
+    }
+    @media (orientation: portrait) {
+      #rotateWarning { display: flex; }
+    }
+  </style>
+</head>
+<body>
+  <div id="gameContainer">
+    <div id="hud">
+      <div class="player-hud">
+        <div class="name-row">
+          <span style="color:#38bdf8;">بطل الرافدين</span>
+          <span style="color:#facc15;font-size:11px;">طاقة خاصة</span>
+        </div>
+        <div class="hp-box"><div id="p1Hp" class="hp-bar"></div></div>
+        <div id="p1SpBox" class="sp-box"><div id="p1Sp" class="sp-bar"></div></div>
+      </div>
+
+      <div id="centerHud">
+        <div id="timer">60</div>
+        <button id="soundBtn">🔊 صوت</button>
+      </div>
+
+      <div class="player-hud">
+        <div class="name-row">
+          <span style="color:#facc15;font-size:11px;">طاقة خاصة</span>
+          <span style="color:#fb7185;">حارس المعبد (AI)</span>
+        </div>
+        <div class="hp-box"><div id="p2Hp" class="hp-bar"></div></div>
+        <div id="p2SpBox" class="sp-box"><div id="p2Sp" class="sp-bar"></div></div>
+      </div>
+    </div>
+
+    <canvas id="arena"></canvas>
+
+    <div id="controls" dir="ltr">
+      <div class="group">
+        <div class="pad" id="btnLeft">◀</div>
+        <div class="pad" id="btnRight">▶</div>
+      </div>
+      <div class="group">
+        <div class="pad" id="btnJump">▲</div>
+        <div class="atk" id="btnPunch">لكمة</div>
+        <div class="atk" id="btnKick">ركلة</div>
+        <div class="atk" id="btnSpecial">خاصة</div>
+      </div>
+    </div>
+
+    <div id="startScreen" class="screen">
+      <div class="title">⚔️ صراع الملوك 2D</div>
+      <div class="sub">اشحن الطاقة الخاصة بالضرب ثم أطلق الضربة الخاصة لحسم الجولة. اختر مستوى الخصم وابدأ فوراً.</div>
+      <div class="diff-row">
+        <button class="diff-btn" data-diff="easy">سهل</button>
+        <button class="diff-btn active" data-diff="medium">متوسط</button>
+        <button class="diff-btn" data-diff="hard">صعب</button>
+      </div>
+      <button id="startBtn" class="primary-btn">ابدأ القتال</button>
+    </div>
+
+    <div id="endScreen" class="screen">
+      <div id="endTitle" class="title">انتهت الجولة</div>
+      <div id="endSub" class="sub"></div>
+      <button id="replayBtn" class="primary-btn">قتال مرة أخرى</button>
+    </div>
+
+    <div id="rotateWarning">
+      <div style="font-size: 38px;">📱🔄</div>
+      <h2>اقلب الموبايل بالعرض</h2>
+      <p style="color:#94a3b8;">اللعبة مصممة للشاشة الأفقية لراحة التحكم ورؤية الساحة كاملة.</p>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('arena');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Web Audio Sound Synthesizer
+    let soundEnabled = true;
+    let audioCtx = null;
+    function ensureAudio() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+    }
+    function playTone(freq, duration, type = 'square', gainVal = 0.08) {
+      if (!soundEnabled) return;
+      ensureAudio();
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (_) {}
+    }
+
+    document.getElementById('soundBtn').addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      document.getElementById('soundBtn').textContent = soundEnabled ? '🔊 صوت' : '🔇 صامت';
+    });
+
+    const GRAVITY = 0.78;
+    let difficulty = 'medium';
+    let matchActive = false;
+    let roundOver = false;
+    let timeLeft = 60;
+    let timerId = null;
+    let shake = 0;
+    let particles = [];
+    let popups = [];
+
+    document.querySelectorAll('.diff-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        difficulty = btn.dataset.diff;
+      });
+    });
+
+    class Fighter {
+      constructor({ x, armorColor, cloakColor, hairColor, facing, isAI }) {
+        this.baseX = x;
+        this.w = 50;
+        this.h = 108;
+        this.armorColor = armorColor;
+        this.cloakColor = cloakColor;
+        this.hairColor = hairColor;
+        this.isAI = isAI;
+        this.reset(facing);
+      }
+
+      reset(facing) {
+        this.x = this.baseX;
+        this.y = this.groundY - this.h;
+        this.vx = 0;
+        this.vy = 0;
+        this.hp = 100;
+        this.sp = 0;
+        this.facing = facing;
+        this.onGround = true;
+        this.attacking = false;
+        this.attackKind = null;
+        this.attackFrames = 0;
+        this.cooldown = 0;
+        this.flash = 0;
+        this.dealtHit = false;
+        this.aiTimer = 0;
+      }
+
+      get groundY() {
+        return canvas.height - 58;
+      }
+
+      startAttack(kind) {
+        if (!matchActive || roundOver || this.attacking || this.cooldown > 0) return;
+        if (kind === 'special' && this.sp < 100) return;
+
+        if (kind === 'special') {
+          this.sp = 0;
+          this.attackFrames = 22;
+          this.cooldown = 36;
+          playTone(520, 0.22, 'sawtooth', 0.11);
+        } else if (kind === 'kick') {
+          this.attackFrames = 18;
+          this.cooldown = 28;
+          playTone(190, 0.12, 'triangle', 0.09);
+        } else {
+          this.attackFrames = 12;
+          this.cooldown = 17;
+          playTone(260, 0.08, 'square', 0.07);
+        }
+
+        this.attacking = true;
+        this.attackKind = kind;
+        this.dealtHit = false;
+      }
+
+      spawnBurst(x, y, color, count = 10) {
+        for (let i = 0; i < count; i++) {
+          particles.push({
+            x,
+            y,
+            vx: (Math.random() - 0.5) * 9,
+            vy: (Math.random() - 0.7) * 8,
+            size: 3 + Math.random() * 4,
+            color,
+            life: 24 + Math.random() * 12
+          });
+        }
+      }
+
+      update(target) {
+        if (this.isAI && matchActive && !roundOver) {
+          this.aiTimer--;
+          const dx = target.x - this.x;
+          this.facing = dx >= 0 ? 1 : -1;
+
+          const reaction = difficulty === 'easy' ? 24 : difficulty === 'medium' ? 15 : 9;
+          const speed = difficulty === 'easy' ? 3.2 : difficulty === 'medium' ? 4.4 : 5.6;
+
+          if (this.aiTimer <= 0) {
+            this.aiTimer = reaction + Math.floor(Math.random() * 10);
+            if (this.sp >= 100 && Math.abs(dx) < 160) {
+              this.vx = 0;
+              this.startAttack('special');
+            } else if (Math.abs(dx) > 76) {
+              this.vx = this.facing * speed;
+            } else {
+              this.vx = 0;
+              const roll = Math.random();
+              if (roll < 0.48) this.startAttack('punch');
+              else if (roll < 0.82) this.startAttack('kick');
+              else if (this.onGround) this.vy = -15.5;
+            }
+          }
+        }
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.y + this.h < this.groundY) {
+          this.vy += GRAVITY;
+          this.onGround = false;
+        } else {
+          this.vy = 0;
+          this.y = this.groundY - this.h;
+          this.onGround = true;
+        }
+
+        const minX = 18;
+        const maxX = canvas.width - this.w - 18;
+        if (this.x < minX) this.x = minX;
+        if (this.x > maxX) this.x = maxX;
+
+        if (!this.isAI && this.vx === 0 && !this.attacking && matchActive && !roundOver) {
+          this.facing = target.x >= this.x ? 1 : -1;
+        }
+
+        if (this.cooldown > 0) this.cooldown--;
+        if (this.flash > 0) this.flash--;
+
+        if (this.attacking) {
+          this.attackFrames--;
+          const reach = this.attackKind === 'special' ? 110 : this.attackKind === 'kick' ? 64 : 46;
+          const dmg = this.attackKind === 'special' ? 24 : this.attackKind === 'kick' ? 14 : 8;
+          const knock = this.attackKind === 'special' ? 36 : this.attackKind === 'kick' ? 24 : 13;
+          const boxX = this.facing === 1 ? this.x + this.w : this.x - reach;
+          const boxY = this.attackKind === 'kick' ? this.y + 52 : this.y + 22;
+          const boxH = this.attackKind === 'special' ? 42 : 28;
+
+          if (
+            !this.dealtHit &&
+            boxX < target.x + target.w &&
+            boxX + reach > target.x &&
+            boxY < target.y + target.h &&
+            boxY + boxH > target.y
+          ) {
+            this.dealtHit = true;
+            target.hp = Math.max(0, target.hp - dmg);
+            target.flash = 8;
+            target.x = Math.min(maxX, Math.max(minX, target.x + this.facing * knock));
+            this.sp = Math.min(100, this.sp + (this.attackKind === 'special' ? 0 : 28));
+            target.sp = Math.min(100, target.sp + 12);
+            shake = this.attackKind === 'special' ? 14 : this.attackKind === 'kick' ? 8 : 5;
+            playTone(this.attackKind === 'special' ? 110 : 145, 0.14, 'sawtooth', 0.1);
+            this.spawnBurst(
+              target.x + target.w / 2,
+              target.y + 40,
+              this.attackKind === 'special' ? '#c084fc' : '#fbbf24',
+              this.attackKind === 'special' ? 18 : 10
+            );
+            popups.push({
+              x: target.x + target.w / 2,
+              y: target.y - 8,
+              text: this.attackKind === 'special' ? `-${dmg}!` : `-${dmg}`,
+              color: this.attackKind === 'special' ? '#e879f9' : '#fde047',
+              alpha: 1
+            });
+            syncHud();
+            checkOutcome();
+          }
+
+          if (this.attackFrames <= 0) {
+            this.attacking = false;
+            this.attackKind = null;
+          }
+        }
+      }
+
+      draw() {
+        ctx.save();
+        // Ground shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+        ctx.beginPath();
+        ctx.ellipse(this.x + this.w / 2, this.groundY + 2, 28, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cloak
+        ctx.fillStyle = this.flash > 0 ? '#ffffff' : this.cloakColor;
+        const cloakX = this.facing === 1 ? this.x - 8 : this.x + 12;
+        ctx.fillRect(cloakX, this.y + 28, 46, 56);
+
+        // Armor torso
+        ctx.fillStyle = this.flash > 0 ? '#ffffff' : this.armorColor;
+        ctx.fillRect(this.x + 5, this.y + 26, this.w - 10, 48);
+
+        // Legs
+        ctx.fillStyle = this.flash > 0 ? '#ffffff' : '#1e293b';
+        ctx.fillRect(this.x + 8, this.y + 74, 13, 34);
+        ctx.fillRect(this.x + this.w - 21, this.y + 74, 13, 34);
+
+        // Head
+        ctx.fillStyle = this.flash > 0 ? '#ffffff' : '#f1c27d';
+        ctx.beginPath();
+        ctx.arc(this.x + this.w / 2, this.y + 15, 14, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Helmet / Crown band
+        ctx.fillStyle = this.flash > 0 ? '#ffffff' : this.hairColor;
+        ctx.fillRect(this.x + 10, this.y + 2, this.w - 20, 8);
+
+        // Eye
+        ctx.fillStyle = '#090b10';
+        const eyeX = this.facing === 1 ? this.x + this.w / 2 + 5 : this.x + this.w / 2 - 10;
+        ctx.fillRect(eyeX, this.y + 12, 5, 4);
+
+        // Active attack effect
+        if (this.attacking) {
+          const reach = this.attackKind === 'special' ? 110 : this.attackKind === 'kick' ? 64 : 46;
+          const ax = this.facing === 1 ? this.x + this.w : this.x - reach;
+          const ay = this.attackKind === 'kick' ? this.y + 58 : this.y + 28;
+          const ah = this.attackKind === 'special' ? 32 : 16;
+
+          ctx.fillStyle =
+            this.attackKind === 'special'
+              ? 'rgba(192, 132, 252, 0.85)'
+              : this.attackKind === 'kick'
+              ? 'rgba(251, 191, 36, 0.85)'
+              : 'rgba(56, 189, 248, 0.85)';
+          ctx.fillRect(ax, ay, reach, ah);
+        }
+
+        ctx.restore();
+      }
+    }
+
+    const p1 = new Fighter({
+      x: 110,
+      armorColor: '#0284c7',
+      cloakColor: '#1d4ed8',
+      hairColor: '#f59e0b',
+      facing: 1,
+      isAI: false
+    });
+
+    const p2 = new Fighter({
+      x: Math.max(240, canvas.width - 165),
+      armorColor: '#dc2626',
+      cloakColor: '#7f1d1d',
+      hairColor: '#fbbf24',
+      facing: -1,
+      isAI: true
+    });
+
+    const input = { left: false, right: false };
+
+    function syncHud() {
+      document.getElementById('p1Hp').style.width = p1.hp + '%';
+      document.getElementById('p2Hp').style.width = p2.hp + '%';
+      document.getElementById('p1Sp').style.width = p1.sp + '%';
+      document.getElementById('p2Sp').style.width = p2.sp + '%';
+      const spBtn = document.getElementById('btnSpecial');
+      if (p1.sp >= 100) spBtn.classList.add('ready');
+      else spBtn.classList.remove('ready');
+    }
+
+    function bindHold(id, onDown, onUp) {
+      const el = document.getElementById(id);
+      const down = (e) => {
+        e.preventDefault();
+        el.classList.add('pressed');
+        onDown();
+      };
+      const up = (e) => {
+        e.preventDefault();
+        el.classList.remove('pressed');
+        if (onUp) onUp();
+      };
+      el.addEventListener('touchstart', down, { passive: false });
+      el.addEventListener('touchend', up, { passive: false });
+      el.addEventListener('touchcancel', up, { passive: false });
+      el.addEventListener('mousedown', down);
+      el.addEventListener('mouseup', up);
+    }
+
+    bindHold('btnLeft', () => { input.left = true; }, () => { input.left = false; });
+    bindHold('btnRight', () => { input.right = true; }, () => { input.right = false; });
+    bindHold('btnJump', () => {
+      if (matchActive && !roundOver && p1.onGround) {
+        p1.vy = -16;
+        playTone(340, 0.08, 'sine', 0.06);
+      }
+    });
+    bindHold('btnPunch', () => p1.startAttack('punch'));
+    bindHold('btnKick', () => p1.startAttack('kick'));
+    bindHold('btnSpecial', () => p1.startAttack('special'));
+
+    function finishMatch(title, sub, isWin) {
+      if (roundOver) return;
+      roundOver = true;
+      clearInterval(timerId);
+      playTone(isWin ? 640 : 150, 0.3, 'triangle', 0.1);
+      document.getElementById('endTitle').textContent = title;
+      document.getElementById('endSub').textContent = sub;
+      document.getElementById('endScreen').style.display = 'flex';
+    }
+
+    function checkOutcome() {
+      if (p2.hp <= 0) finishMatch('🏆 انتصار ساحق!', 'أسقطت حارس المعبد وربحت الجولة.', true);
+      else if (p1.hp <= 0) finishMatch('💀 هزيمة في الساحة', 'الخصم تغلب عليك، جرّب شحن الضربة الخاصة.', false);
+    }
+
+    function startRound() {
+      ensureAudio();
+      resize();
+      p1.baseX = Math.max(50, Math.floor(canvas.width * 0.16));
+      p2.baseX = Math.max(180, Math.floor(canvas.width * 0.84) - p2.w);
+      p1.reset(1);
+      p2.reset(-1);
+      particles = [];
+      popups = [];
+      timeLeft = 60;
+      roundOver = false;
+      matchActive = true;
+      document.getElementById('timer').textContent = timeLeft;
+      document.getElementById('hud').style.display = 'flex';
+      document.getElementById('controls').style.display = 'flex';
+      document.getElementById('startScreen').style.display = 'none';
+      document.getElementById('endScreen').style.display = 'none';
+      syncHud();
+
+      clearInterval(timerId);
+      timerId = setInterval(() => {
+        if (!matchActive || roundOver) return;
+        timeLeft--;
+        document.getElementById('timer').textContent = timeLeft;
+        if (timeLeft <= 0) {
+          if (p1.hp > p2.hp) finishMatch('🏆 فوز بالنقاط', 'صحتك كانت أعلى عند انتهاء الوقت.', true);
+          else if (p2.hp > p1.hp) finishMatch('⏱️ انتهى الوقت لصالح الخصم', 'صحة الخصم كانت أعلى عند الصفارة.', false);
+          else finishMatch('⚖️ تعادل مشرف', 'تساوت الصحة حتى اللحظة الأخيرة.', false);
+        }
+      }, 1000);
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startRound);
+    document.getElementById('replayBtn').addEventListener('click', startRound);
+
+    function drawStage() {
+      const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      sky.addColorStop(0, '#0f172a');
+      sky.addColorStop(0.6, '#1e293b');
+      sky.addColorStop(1, '#334155');
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Temple pillars in background
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.55)';
+      const pillarSpacing = Math.max(140, Math.floor(canvas.width / 4));
+      for (let x = 60; x < canvas.width - 40; x += pillarSpacing) {
+        ctx.fillRect(x, 60, 26, canvas.height - 118);
+      }
+
+      // Ground
+      const gy = canvas.height - 58;
+      ctx.fillStyle = '#090d16';
+      ctx.fillRect(0, gy, canvas.width, 58);
+      ctx.fillStyle = '#d97706';
+      ctx.fillRect(0, gy, canvas.width, 4);
+    }
+
+    function frame() {
+      ctx.save();
+      if (shake > 0) {
+        shake--;
+        ctx.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake);
+      }
+
+      drawStage();
+
+      if (matchActive && !roundOver) {
+        p1.vx = 0;
+        if (input.left) { p1.vx = -5.4; p1.facing = -1; }
+        if (input.right) { p1.vx = 5.4; p1.facing = 1; }
+      } else {
+        p1.vx = 0;
+        p2.vx = 0;
+      }
+
+      p1.update(p2);
+      p2.update(p1);
+      syncHud();
+
+      p1.draw();
+      p2.draw();
+
+      // Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const pt = particles[i];
+        pt.x += pt.vx;
+        pt.y += pt.vy;
+        pt.vy += 0.35;
+        pt.life--;
+        ctx.fillStyle = pt.color;
+        ctx.fillRect(pt.x, pt.y, pt.size, pt.size);
+        if (pt.life <= 0) particles.splice(i, 1);
+      }
+
+      // Damage popups
+      for (let i = popups.length - 1; i >= 0; i--) {
+        const pop = popups[i];
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, pop.alpha);
+        ctx.fillStyle = pop.color;
+        ctx.font = '900 20px system-ui, sans-serif';
+        ctx.fillText(pop.text, pop.x - 16, pop.y);
+        ctx.restore();
+        pop.y -= 1.1;
+        pop.alpha -= 0.025;
+        if (pop.alpha <= 0) popups.splice(i, 1);
+      }
+
+      ctx.restore();
+      requestAnimationFrame(frame);
+    }
+
+    frame();
+  </script>
+</body>
+</html>
