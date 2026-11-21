@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>تجربة قتال 3D - Three.js</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    body {
+      background: #070a12;
+      color: #f8fafc;
+      font-family: system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+    #hud {
+      position: absolute;
+      top: 10px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .hp-wrap {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.8);
+      border: 2px solid #475569;
+      border-radius: 8px;
+      padding: 3px;
+      height: 22px;
+    }
+    .hp-fill {
+      height: 100%;
+      width: 100%;
+      border-radius: 5px;
+      transition: width 0.12s linear;
+    }
+    #p1Bar { background: #38bdf8; float: right; }
+    #p2Bar { background: #f87171; float: left; }
+    .tag {
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid #334155;
+    }
+    #controls {
+      position: absolute;
+      bottom: 14px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .group {
+      display: flex;
+      gap: 10px;
+      pointer-events: auto;
+    }
+    .btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      background: rgba(30, 41, 59, 0.75);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn.hit {
+      background: rgba(239, 68, 68, 0.8);
+      border-color: #fca5a5;
+    }
+    .btn.active {
+      transform: scale(0.93);
+      background: rgba(56, 189, 248, 0.65);
+    }
+    #banner {
+      position: absolute;
+      top: 42px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #cbd5e1;
+      background: rgba(9, 13, 22, 0.7);
+      padding: 3px 10px;
+      border-radius: 999px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    #fallback {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      background: #070a12;
+      z-index: 25;
+    }
+  </style>
+</head>
+<body>
+  <div id="hud">
+    <span class="tag" style="color:#38bdf8;">أنت (3D)</span>
+    <div class="hp-wrap"><div id="p1Bar" class="hp-fill"></div></div>
+    <div class="hp-wrap"><div id="p2Bar" class="hp-fill"></div></div>
+    <span class="tag" style="color:#f87171;">الخصم AI</span>
+  </div>
+  <div id="banner">نسخة تجربة 3D خفيفة — اقترب واضرب</div>
+
+  <div id="controls" dir="ltr">
+    <div class="group">
+      <div class="btn" id="bLeft">◀</div>
+      <div class="btn" id="bRight">▶</div>
+    </div>
+    <div class="group">
+      <div class="btn" id="bJump">▲</div>
+      <div class="btn hit" id="bAttack">ضرب</div>
+    </div>
+  </div>
+
+  <div id="fallback">
+    <div>تعذر تحميل مكتبة Three.js (تحقق من الاتصال بالإنترنت).</div>
+  </div>
+
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      document.getElementById('fallback').style.display = 'flex';
+    } else {
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x090d16);
+      scene.fog = new THREE.Fog(0x090d16, 14, 34);
+
+      const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+      camera.position.set(0, 4.2, 11.5);
+      camera.lookAt(0, 1.5, 0);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      document.body.appendChild(renderer.domElement);
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // Lights
+      scene.add(new THREE.AmbientLight(0x94a3b8, 0.9));
+      const dirLight = new THREE.DirectionalLight(0xffffff, 1.4);
+      dirLight.position.set(5, 10, 7);
+      scene.add(dirLight);
+
+      // Floor & Arena Pillars
+      const floor = new THREE.Mesh(
+        new THREE.BoxGeometry(16, 0.5, 8),
+        new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.7 })
+      );
+      floor.position.y = -0.25;
+      scene.add(floor);
+
+      const pillarGeo = new THREE.BoxGeometry(0.6, 4.5, 0.6);
+      const pillarMat = new THREE.MeshStandardMaterial({ color: 0x334155 });
+      [-6.5, 6.5].forEach(px => {
+        [-3.2, 3.2].forEach(pz => {
+          const pillar = new THREE.Mesh(pillarGeo, pillarMat);
+          pillar.position.set(px, 2.25, pz);
+          scene.add(pillar);
+        });
+      });
+
+      function createFighter(colorHex, xPos) {
+        const group = new THREE.Group();
+        const mat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.4 });
+        const body = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.8, 0.8), mat);
+        body.position.y = 1.2;
+        group.add(body);
+
+        const head = new THREE.Mesh(
+          new THREE.BoxGeometry(0.8, 0.8, 0.8),
+          new THREE.MeshStandardMaterial({ color: 0xf1c27d })
+        );
+        head.position.y = 2.55;
+        group.add(head);
+
+        const fist = new THREE.Mesh(
+          new THREE.BoxGeometry(0.9, 0.45, 0.5),
+          new THREE.MeshStandardMaterial({ color: 0xfbbf24 })
+        );
+        fist.position.set(0.85, 1.35, 0);
+        group.add(fist);
+
+        group.position.set(xPos, 0, 0);
+        scene.add(group);
+        return {
+          mesh: group,
+          bodyMat: mat,
+          fist,
+          vx: 0,
+          vy: 0,
+          hp: 100,
+          facing: xPos < 0 ? 1 : -1,
+          atkTimer: 0,
+          cooldown: 0,
+          flash: 0,
+          hitDone: false,
+          aiTimer: 0
+        };
+      }
+
+      const p1 = createFighter(0x0ea5e9, -3.2);
+      const p2 = createFighter(0xef4444, 3.2);
+
+      const state = { left: false, right: false };
+
+      function bindBtn(id, onDown, onUp) {
+        const el = document.getElementById(id);
+        const start = (e) => { e.preventDefault(); el.classList.add('active'); onDown(); };
+        const end = (e) => { e.preventDefault(); el.classList.remove('active'); if (onUp) onUp(); };
+        el.addEventListener('touchstart', start, { passive: false });
+        el.addEventListener('touchend', end, { passive: false });
+        el.addEventListener('touchcancel', end, { passive: false });
+        el.addEventListener('mousedown', start);
+        el.addEventListener('mouseup', end);
+      }
+
+      bindBtn('bLeft', () => { state.left = true; }, () => { state.left = false; });
+      bindBtn('bRight', () => { state.right = true; }, () => { state.right = false; });
+      bindBtn('bJump', () => {
+        if (p1.mesh.position.y <= 0.01) p1.vy = 0.24;
+      });
+      bindBtn('bAttack', () => triggerAttack(p1));
+
+      function triggerAttack(f) {
+        if (f.atkTimer > 0 || f.cooldown > 0 || f.hp <= 0) return;
+        f.atkTimer = 10;
+        f.cooldown = 20;
+        f.hitDone = false;
+      }
+
+      function resetFight() {
+        p1.hp = 100;
+        p2.hp = 100;
+        p1.mesh.position.set(-3.2, 0, 0);
+        p2.mesh.position.set(3.2, 0, 0);
+        p1.vy = 0;
+        p2.vy = 0;
+        updateBars();
+      }
+
+      function updateBars() {
+        document.getElementById('p1Bar').style.width = Math.max(0, p1.hp) + '%';
+        document.getElementById('p2Bar').style.width = Math.max(0, p2.hp) + '%';
+      }
+
+      function stepFighter(f, other, isAI) {
+        if (isAI && f.hp > 0 && other.hp > 0) {
+          f.aiTimer--;
+          const dx = other.mesh.position.x - f.mesh.position.x;
+          f.facing = dx >= 0 ? 1 : -1;
+          if (f.aiTimer <= 0) {
+            f.aiTimer = 18;
+            if (Math.abs(dx) > 2.2) f.vx = f.facing * 0.075;
+            else {
+              f.vx = 0;
+              triggerAttack(f);
+            }
+          }
+        }
+
+        f.mesh.position.x += f.vx;
+        f.mesh.position.y += f.vy;
+
+        if (f.mesh.position.y > 0) {
+          f.vy -= 0.014;
+        } else {
+          f.mesh.position.y = 0;
+          f.vy = 0;
+        }
+
+        f.mesh.position.x = Math.max(-5.8, Math.min(5.8, f.mesh.position.x));
+        f.mesh.rotation.y = f.facing === 1 ? 0 : Math.PI;
+
+        if (f.cooldown > 0) f.cooldown--;
+        if (f.flash > 0) {
+          f.flash--;
+          f.bodyMat.emissive.setHex(0xffffff);
+        } else {
+          f.bodyMat.emissive.setHex(0x000000);
+        }
+
+        if (f.atkTimer > 0) {
+          f.atkTimer--;
+          f.fist.position.x = 1.45;
+          const distX = Math.abs(f.mesh.position.x - other.mesh.position.x);
+          const distY = Math.abs(f.mesh.position.y - other.mesh.position.y);
+          if (!f.hitDone && distX < 2.35 && distY < 1.2) {
+            f.hitDone = true;
+            other.hp = Math.max(0, other.hp - 12);
+            other.flash = 6;
+            other.mesh.position.x = Math.max(-5.8, Math.min(5.8, other.mesh.position.x + f.facing * 0.65));
+            updateBars();
+            if (other.hp <= 0) {
+              setTimeout(resetFight, 900);
+            }
+          }
+        } else {
+          f.fist.position.x = 0.85;
+        }
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        p1.vx = 0;
+        if (p1.hp > 0 && p2.hp > 0) {
+          if (state.left) { p1.vx = -0.09; p1.facing = -1; }
+          if (state.right) { p1.vx = 0.09; p1.facing = 1; }
+        }
+        stepFighter(p1, p2, false);
+        stepFighter(p2, p1, true);
+        renderer.render(scene, camera);
+      }
+
+      animate();
+    }
+  </script>
+</body>
+</html>
