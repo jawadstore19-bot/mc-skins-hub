@@ -1,0 +1,34 @@
+name: Build Android AAB
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Bubblewrap and build AAB
+        run: |
+          npm install -g @pwabuilder/bubblewrap
+          mkdir -p twa-app && cd twa-app
+          yes | bubblewrap init --manifest=https://jawadstore19-bot.github.io/mc-skins-hub/manifest.json
+          bubblewrap build
+
+      - name: Upload AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mc-skins-aab
+          path: twa-app/**/*.aab
